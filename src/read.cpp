@@ -301,7 +301,7 @@ void sam_read::write_to(std::ostream& out) const {
     if (trimmed_)
         write_optional(out);
     else
-        out << optional_;
+        out << '\t' << optional_;
     out << std::endl;
 }
 
