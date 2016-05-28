@@ -2,6 +2,7 @@
 // Author: Timofey Prodanov
 
 #include <set>
+#include <array>
 
 #include "trim.h"
 
@@ -126,6 +127,17 @@ float align_from_the_right(std::string const& seq, std::string const& amplicon, 
     return score;
 }
 
+static size_t const kmers_count = 7;
+void fill_kmer_positions(size_t n, size_t k, std::array<size_t, kmers_count>& kmer_positions) {
+    kmer_positions[0] = n / 2 - k / 2;
+    kmer_positions[1] = n / 3 - k / 2;
+    kmer_positions[2] = 2 * n / 3 - k / 2;
+    kmer_positions[3] = k;
+    kmer_positions[4] = n - 2 * k;
+    kmer_positions[5] = 0;
+    kmer_positions[6] = n - k;
+}
+
 std::set<int> possible_amplicons(std::string const& seq, amplicon_index const& ai) {
     size_t n = seq.size();
     size_t k = ai.get_k();
@@ -133,11 +145,8 @@ std::set<int> possible_amplicons(std::string const& seq, amplicon_index const& a
         return std::set<int>();
     }
 
-    static size_t const kmers_count = 7;
-    size_t kmer_pos[kmers_count] = {n / 2 - k / 2,
-                                    k, n - 2 * k,
-                                    n / 3 - k / 2, 2 * n / 3 - k / 2,
-                                    0, n - k};
+    std::array<size_t, kmers_count> kmer_pos;
+    fill_kmer_positions(n, k, kmer_pos);
 
     std::set<int> result;
     for (size_t i = 0; i < kmers_count; ++i) {
@@ -170,15 +179,10 @@ std::set<int> possible_amplicons(std::string const& seq1,
         return std::set<int>();
     }
 
-    static size_t const kmers_count = 7;
-    size_t kmer_pos1[kmers_count] = {n1 / 2 - k / 2,
-                                     k, n1 - 2 * k,
-                                     n1 / 3 - k / 2, 2 * n1 / 3 - k / 2,
-                                     0, n1 - k};
-    size_t kmer_pos2[kmers_count] = {n2 / 2 - k / 2,
-                                     k, n2 - 2 * k,
-                                     n2 / 3 - k / 2, 2 * n2 / 3 - k / 2,
-                                     0, n2 - k};
+    std::array<size_t, kmers_count> kmer_pos1;
+    fill_kmer_positions(n1, k, kmer_pos1);
+    std::array<size_t, kmers_count> kmer_pos2;
+    fill_kmer_positions(n2, k, kmer_pos2);
 
     std::vector<int> amplicons1;
     std::set<int> amplicons2;
